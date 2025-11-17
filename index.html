@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UnitEconomy — калькулятор юнит-экономики</title>
+    <link rel="stylesheet" href="./assets/css/base.css" />
+    <link rel="stylesheet" href="./assets/css/layout.css" />
+    <link rel="stylesheet" href="./assets/css/components.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar" role="banner">
+        <div class="topbar__content">
+          <div>
+            <p class="eyebrow">UnitEconomy</p>
+            <h1>Калькулятор юнит-экономики</h1>
+          </div>
+          <p class="topbar__meta">
+            Модульный сервис для расчёта налогов, расходов и сценариев цены
+          </p>
+        </div>
+      </header>
+
+      <div class="app-body">
+        <aside class="sidebar" aria-label="Секции приложения">
+          <nav>
+            <ul class="sidebar__nav">
+              <li><a href="#inputs-section">Параметры</a></li>
+              <li><a href="#variable-expenses-section">Переменные расходы</a></li>
+              <li><a href="#fixed-expenses-section">Постоянные расходы</a></li>
+              <li><a href="#results-section">Результаты</a></li>
+              <li><a href="#scenario-section">Сценарии цены</a></li>
+              <li><a href="#tax-settings-section">Налоговые режимы</a></li>
+            </ul>
+          </nav>
+        </aside>
+
+        <main class="content" id="main-content" tabindex="-1">
+          <section class="panel" id="inputs-section">
+            <div class="panel__header">
+              <h2>Основные параметры</h2>
+              <p class="panel__description">
+                Настройте режим расчёта, налоговый режим и базовые входные данные.
+              </p>
+            </div>
+
+            <form id="unit-inputs-form" class="form-grid" aria-describedby="inputs-hint">
+              <p id="inputs-hint" class="sr-only">
+                Все значения должны быть указаны в числовом формате.
+              </p>
+
+              <label class="form-field">
+                <span>Тип расчёта</span>
+                <select name="mode" id="mode-select">
+                  <option value="SERVICE">Услуги</option>
+                  <option value="PRODUCT">Товары</option>
+                  <option value="TURNOVER">По обороту</option>
+                </select>
+              </label>
+
+              <label class="form-field">
+                <span>Налоговый режим</span>
+                <select name="taxModeId" id="tax-mode-select"></select>
+              </label>
+
+              <label class="form-field">
+                <span>Планируемое количество (ед.)</span>
+                <input type="number" name="plannedQuantity" id="planned-quantity" min="1" step="1" />
+              </label>
+
+              <label class="form-field">
+                <span>Оборот за период</span>
+                <input type="number" name="plannedRevenueTotal" id="planned-revenue" min="0" step="1000" />
+              </label>
+
+              <label class="form-field">
+                <span>Цена / чек</span>
+                <input type="number" name="pricePerUnit" id="price-per-unit" min="0" step="10" />
+              </label>
+
+              <label class="form-field checkbox-field">
+                <input type="checkbox" name="priceIncludesVat" id="price-includes-vat" />
+                <span>Цена включает НДС</span>
+              </label>
+            </form>
+          </section>
+
+          <section class="panel" id="variable-expenses-section">
+            <div class="panel__header">
+              <h2>Переменные расходы</h2>
+              <p class="panel__description">
+                Добавьте статьи расходов на единицу товара или услуги.
+              </p>
+              <button type="button" class="btn btn--secondary" id="add-variable-expense">
+                Добавить статью
+              </button>
+            </div>
+
+            <div class="table-wrapper" role="region" aria-live="polite">
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Название</th>
+                    <th scope="col">Сумма/ед., ₽</th>
+                    <th scope="col">%, от выручки</th>
+                    <th scope="col">Итого/ед., ₽</th>
+                    <th scope="col" aria-label="Удалить"></th>
+                  </tr>
+                </thead>
+                <tbody id="variable-expenses-body"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="panel" id="fixed-expenses-section">
+            <div class="panel__header">
+              <h2>Постоянные расходы</h2>
+              <p class="panel__description">
+                Укажите фиксированные суммы за период или проценты от выручки.
+              </p>
+              <button type="button" class="btn btn--secondary" id="add-fixed-expense">
+                Добавить статью
+              </button>
+            </div>
+
+            <div class="table-wrapper" role="region" aria-live="polite">
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Название</th>
+                    <th scope="col">Сумма/период, ₽</th>
+                    <th scope="col">% от выручки</th>
+                    <th scope="col">Итого, ₽</th>
+                    <th scope="col" aria-label="Удалить"></th>
+                  </tr>
+                </thead>
+                <tbody id="fixed-expenses-body"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="panel" id="results-section">
+            <div class="panel__header">
+              <h2>Результаты расчёта</h2>
+              <p class="panel__description">Итоги обновляются автоматически при изменении данных.</p>
+            </div>
+
+            <div class="cards-grid" id="summary-cards" aria-live="polite"></div>
+
+            <div class="panel__subsection">
+              <h3>Детали</h3>
+              <div class="details-grid" id="details-grid" role="list"></div>
+            </div>
+          </section>
+
+          <section class="panel" id="scenario-section">
+            <div class="panel__header">
+              <h2>Сценарии изменения цены</h2>
+              <p class="panel__description">Сравните влияние скидок и наценок на чистую прибыль.</p>
+            </div>
+
+            <form id="scenario-form" class="form-grid scenario-form">
+              <label class="form-field">
+                <span>Шаг</span>
+                <select name="stepType" id="scenario-step-type">
+                  <option value="percent">%</option>
+                  <option value="currency">₽</option>
+                </select>
+              </label>
+
+              <label class="form-field">
+                <span>Значение шага</span>
+                <input type="number" name="stepValue" id="scenario-step-value" min="1" step="1" />
+              </label>
+
+              <label class="form-field">
+                <span>Количество шагов</span>
+                <input type="number" name="steps" id="scenario-steps" min="1" max="6" />
+              </label>
+            </form>
+
+            <div class="table-wrapper" role="region">
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Сценарий</th>
+                    <th scope="col">Цена, ₽</th>
+                    <th scope="col">Выручка, ₽</th>
+                    <th scope="col">Чистая прибыль, ₽</th>
+                    <th scope="col">ЧП/ед., ₽</th>
+                    <th scope="col">Δ к базовой</th>
+                  </tr>
+                </thead>
+                <tbody id="scenario-body"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="panel" id="tax-settings-section">
+            <div class="panel__header">
+              <h2>Налоговые режимы</h2>
+              <p class="panel__description">
+                Просмотрите активные пресеты и при необходимости скорректируйте настройки.
+              </p>
+              <button type="button" class="btn btn--ghost" id="refresh-tax-presets">
+                Обновить пресеты
+              </button>
+            </div>
+            <p class="panel__hint" id="tax-presets-status" role="status" aria-live="polite"></p>
+
+            <div class="table-wrapper" role="region">
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Название</th>
+                    <th scope="col">Тип</th>
+                    <th scope="col">Ставка</th>
+                    <th scope="col">НДС</th>
+                    <th scope="col">Примечания</th>
+                  </tr>
+                </thead>
+                <tbody id="tax-presets-body"></tbody>
+              </table>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <template id="variable-expense-row">
+      <tr>
+        <td>
+          <input type="text" name="name" autocomplete="off" />
+        </td>
+        <td>
+          <input type="number" name="valueFixedPerUnit" min="0" step="10" />
+        </td>
+        <td>
+          <input type="number" name="valuePercentPerUnitRevenue" min="0" max="100" step="0.1" />
+        </td>
+        <td class="value-cell" data-field="variableCostPerUnit">0</td>
+        <td>
+          <button type="button" class="btn-icon" aria-label="Удалить статью">&times;</button>
+        </td>
+      </tr>
+    </template>
+
+    <template id="fixed-expense-row">
+      <tr>
+        <td>
+          <input type="text" name="name" autocomplete="off" />
+        </td>
+        <td>
+          <input type="number" name="valueFixedPerPeriod" min="0" step="100" />
+        </td>
+        <td>
+          <input type="number" name="valuePercentOfRevenueTotal" min="0" max="100" step="0.1" />
+        </td>
+        <td class="value-cell" data-field="fixedCostTotal">0</td>
+        <td>
+          <button type="button" class="btn-icon" aria-label="Удалить статью">&times;</button>
+        </td>
+      </tr>
+    </template>
+
+    <script type="module" src="./assets/js/main.js"></script>
+  </body>
+</html>

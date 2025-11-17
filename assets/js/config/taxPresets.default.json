@@ -1,0 +1,75 @@
+[
+  {
+    "id": "usn-income",
+    "name": "УСН доходы без НДС",
+    "baseType": "USN",
+    "incomeBase": "REVENUE",
+    "taxRate": 6,
+    "vatEnabled": false,
+    "vatMode": "none"
+  },
+  {
+    "id": "usn-income-expense",
+    "name": "УСН доходы-расходы",
+    "baseType": "USN",
+    "incomeBase": "PROFIT",
+    "taxRate": 15,
+    "minTaxRateFromRevenue": 1,
+    "vatEnabled": false,
+    "vatMode": "none"
+  },
+  {
+    "id": "usn-income-vat",
+    "name": "УСН доходы с НДС",
+    "baseType": "USN",
+    "incomeBase": "REVENUE",
+    "taxRate": 6,
+    "vatEnabled": true,
+    "vatMode": "withInputDeduction",
+    "vatRateOutput": 20,
+    "avgInputVatShareVariable": 0.2,
+    "avgInputVatShareFixed": 0.05
+  },
+  {
+    "id": "ausn-income",
+    "name": "АУСН доходы",
+    "baseType": "AUSN",
+    "incomeBase": "REVENUE",
+    "taxRate": 8,
+    "vatEnabled": false,
+    "vatMode": "none"
+  },
+  {
+    "id": "ausn-income-expense",
+    "name": "АУСН доходы-расходы",
+    "baseType": "AUSN",
+    "incomeBase": "PROFIT",
+    "taxRate": 20,
+    "minTaxRateFromRevenue": 3,
+    "vatEnabled": false,
+    "vatMode": "none"
+  },
+  {
+    "id": "psn",
+    "name": "Патент (ПСН)",
+    "baseType": "PATENT",
+    "incomeBase": "FIXED",
+    "taxRate": 0,
+    "patentCostPerPeriod": 50000,
+    "vatEnabled": false,
+    "vatMode": "none"
+  },
+  {
+    "id": "osno",
+    "name": "ОСНО",
+    "baseType": "OSNO",
+    "incomeBase": "PROFIT",
+    "taxRate": 20,
+    "vatEnabled": true,
+    "vatMode": "withInputDeduction",
+    "vatRateOutput": 20,
+    "avgInputVatShareVariable": 0.2,
+    "avgInputVatShareFixed": 0.1
+  }
+]
+
