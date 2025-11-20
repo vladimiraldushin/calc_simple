@@ -1,35 +1,25 @@
-name: Deploy to Jino Hosting
+name: FTP Deploy
 
 on:
   push:
     branches:
-      - main  # или master, в зависимости от вашей ветки
+      - main
 
 jobs:
-  deploy:
-    name: FTP Deploy
+  ftp-deploy:
     runs-on: ubuntu-latest
-    
     steps:
-      - name: 📥 Checkout code
+      - name: Checkout
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 2
-      
-      - name: 🚀 Deploy via FTP
+
+      - name: FTP Deploy
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
-          server: ${{ secrets.FTP_SERVER }}
+          server: ftp.yourdomain.ru
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftp
-          local-dir: './'  # папка в репозитории
-          server-dir: '/'  # папка на хостинге
-          exclude: |
-            **/.git*
-            **/.env
-            **/node_modules/**
-            **/vendor/**
-            **/tests/**
-            **/.DS_Store
+          protocol: ftps
+          port: 990
+          local-dir: ./dist     # твоя папка
           dangerous-clean-slate: false
+          timeout: 60000        # увеличиваем на всякий случай
